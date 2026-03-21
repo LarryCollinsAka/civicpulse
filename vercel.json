@@ -1,9 +1,5 @@
 {
   "rewrites": [
     { "source": "/api/:path*", "destination": "/backend/api/index.py" }
-  ],
-  "crons": [
-    { "path": "/api/crons/classify-pending", "schedule": "*/5 * * * *" },
-    { "path": "/api/crons/sdg-report",       "schedule": "0 6 * * 1"   }
   ]
 }
