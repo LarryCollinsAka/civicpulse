@@ -1,3 +1,4 @@
+import React from "react";
 import type { CMSPartner } from "@/lib/cms";
 
 export function Partners({ items }: { items: CMSPartner[] }) {
