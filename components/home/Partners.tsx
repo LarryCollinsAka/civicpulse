@@ -18,7 +18,11 @@ export function Partners({ items }: { items: CMSPartner[] }) {
               rel="noopener noreferrer"
               className="opacity-60 grayscale transition hover:opacity-100 hover:grayscale-0"
             >
-              <img src={p.logo_url} alt={p.name} className="h-10 object-contain" />
+              <img
+                src={p.logo_url}
+                alt={p.name}
+                className="h-10 object-contain"
+              />
             </a>
           ))}
         </div>
