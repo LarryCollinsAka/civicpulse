@@ -17,23 +17,21 @@ export function Partners({ items }: Props) {
           Ils nous font confiance
         </p>
         <div className="flex flex-wrap items-center justify-center gap-10">
-          {items.map(function (p) {
-            return (
-              
-                key={p.id}
-                href={p.website ?? "#"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="opacity-60 grayscale transition hover:opacity-100 hover:grayscale-0"
-              >
-                <img
-                  src={p.logo_url}
-                  alt={p.name}
-                  className="h-10 object-contain"
-                />
-              </a>
-            );
-          })}
+          {items.map((p) => (
+            <a
+              key={p.id}
+              href={p.website ?? "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="opacity-60 grayscale transition hover:opacity-100 hover:grayscale-0"
+            >
+              <img
+                src={p.logo_url}
+                alt={p.name}
+                className="h-10 object-contain"
+              />
+            </a>
+          ))}
         </div>
       </div>
     </section>
