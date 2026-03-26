@@ -76,10 +76,12 @@ export function HeroSection({ cms, locale }: Props) {
         </p>
 
         {/* CTAs */}
+        {/* CTAs */}
         <div className="mt-10 flex flex-wrap justify-center gap-4">
           <Link
             href={cta_href}
-            className="rounded-full bg-brand-600 px-8 py-3 text-sm font-semibold text-white shadow transition hover:bg-brand-800 hover:-translate-y-0.5"
+            className="rounded-full px-8 py-3 text-sm font-semibold shadow transition hover:-translate-y-0.5"
+            style={{ backgroundColor: "#1A6B4A", color: "#ffffff" }}
           >
             {cta}
           </Link>
