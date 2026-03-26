@@ -1,27 +1,30 @@
 "use client";
 
-import Link   from "next/link";
+import Link from "next/link";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import type { CMSContent, Locale } from "@/lib/cms";
 
-interface Props { cms: CMSContent; locale: Locale; }
+interface Props {
+  cms: CMSContent;
+  locale: Locale;
+}
 
 const t = {
   fr: {
-    badge:    "Aligné sur les ODD de l'ONU",
+    badge: "Aligné sur les ODD de l'ONU",
     headline: "La ville à l'écoute de ses citoyens.",
-    sub:      "Signalez les incidents, suivez leur résolution et participez à la gouvernance de votre ville — via WhatsApp ou le web.",
-    cta:      "Explorer la démo",
-    cta2:     "En savoir plus",
+    sub: "Signalez les incidents, suivez leur résolution et participez à la gouvernance de votre ville — via WhatsApp ou le web.",
+    cta: "Explorer la démo",
+    cta2: "En savoir plus",
     switchTo: "EN",
   },
   en: {
-    badge:    "Aligned with UN SDGs",
+    badge: "Aligned with UN SDGs",
     headline: "The city that listens to its citizens.",
-    sub:      "Report incidents, track resolutions, and participate in city governance — via WhatsApp or the web.",
-    cta:      "Explore the demo",
-    cta2:     "Learn more",
+    sub: "Report incidents, track resolutions, and participate in city governance — via WhatsApp or the web.",
+    cta: "Explore the demo",
+    cta2: "Learn more",
     switchTo: "FR",
   },
 } as const;
@@ -32,8 +35,8 @@ export function HeroSection({ cms, locale }: Props) {
   // Pull CMS overrides with fallback to defaults
   const c = cms.content["hero"] ?? {};
   const headline = c["headline"] ?? i18n.headline;
-  const sub      = c["sub"]      ?? i18n.sub;
-  const cta      = c["cta"]      ?? i18n.cta;
+  const sub = c["sub"] ?? i18n.sub;
+  const cta = c["cta"] ?? i18n.cta;
   const cta_href = c["cta_href"] ?? "/auth/register";
 
   return (
@@ -91,7 +94,7 @@ export function HeroSection({ cms, locale }: Props) {
         {/* SDG pills */}
         <div className="mt-12 flex flex-wrap justify-center gap-2">
           {[
-            { n: 6,  label: "SDG 6",  color: "#26BDE2" },
+            { n: 6, label: "SDG 6", color: "#26BDE2" },
             { n: 11, label: "SDG 11", color: "#FD9D24" },
             { n: 13, label: "SDG 13", color: "#3F7E44" },
             { n: 15, label: "SDG 15", color: "#56C02B" },
@@ -129,7 +132,7 @@ function LanguageSwitcher({ current }: { current: Locale }) {
             "rounded-full px-3 py-1 transition",
             current === loc
               ? "bg-brand-600 text-white"
-              : "hover:bg-muted text-muted-foreground"
+              : "hover:bg-muted text-muted-foreground",
           )}
         >
           {loc.toUpperCase()}
