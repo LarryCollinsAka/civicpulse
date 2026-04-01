@@ -1,3 +1,18 @@
+import os
+import sys
+
+# Get the absolute path of the current file's directory (backend/app)
+current_dir = os.path.dirname(os.path.abspath(__file__))
+# Get the parent directory (backend)
+parent_dir = os.path.dirname(current_dir)
+
+# Add both to sys.path so 'app' and 'backend' are discoverable
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
+if current_dir not in sys.path:
+    sys.path.insert(0, current_dir)
+
+    
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
