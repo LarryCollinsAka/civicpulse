@@ -1,0 +1,28 @@
+backend/
+├─ alembic/
+│  └─ versions/
+│     └─ 008_cms.py
+├─ api/
+├─ app/
+│  ├─ db/
+│  │  ├─ __init__.py
+│  │  ├─ base.py
+│  │  └─ session.py
+│  ├─ dependencies/
+│  │  ├─ __init__.py
+│  │  ├─ auth.py
+│  │  └─ db.py
+│  ├─ models/
+│  │  ├─ __init__.py
+│  │  └─ user.py
+│  ├─ routers/
+│  │  ├─ __init__.py
+│  │  └─ auth.py
+│  ├─ schemas/
+│  │  ├─ __init__.py
+│  │  └─ auth.py
+│  ├─ __init__.py
+│  ├─ config.py
+│  └─ main.py
+├─ requirements-dev.txt
+└─ requirements.txt

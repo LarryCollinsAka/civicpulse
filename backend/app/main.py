@@ -1,17 +1,37 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .routers import auth, incidents, ai, cities, users, reports, webhooks
+from app.config import settings
+from app.routers import auth
 
-app = FastAPI(title="CivicPulse API", version="1.0.0")
+app = FastAPI(
+    title="CivicPulse API",
+    version="1.0.0",
+    description="Smart city incident reporting platform API",
+    docs_url="/api/docs",
+    redoc_url="/api/redoc",
+    openapi_url="/api/openapi.json",
+)
 
-app.add_middleware(CORSMiddleware,
-    allow_origins=["https://civicpulse.vercel.app"],
-    allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+# ── CORS ───────────────────────────────────────────────────────────────────
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        settings.frontend_url,
+        "https://civicpulse-gray.vercel.app/",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-app.include_router(auth.router,      prefix="/api/auth",      tags=["auth"])
-app.include_router(incidents.router, prefix="/api/incidents", tags=["incidents"])
-app.include_router(ai.router,        prefix="/api/ai",        tags=["ai"])
-app.include_router(cities.router,    prefix="/api/cities",    tags=["cities"])
-app.include_router(users.router,     prefix="/api/users",     tags=["users"])
-app.include_router(reports.router,   prefix="/api/reports",   tags=["reports"])
-app.include_router(webhooks.router,  prefix="/api/webhooks",  tags=["webhooks"])
+# ── Routers ────────────────────────────────────────────────────────────────
+app.include_router(
+    auth.router,
+    prefix="/api/auth",
+    tags=["auth"],
+)
+
+# ── Health check ───────────────────────────────────────────────────────────
+@app.get("/api/health", tags=["health"])
+async def health():
+    return {"status": "ok", "version": "1.0.0"}
