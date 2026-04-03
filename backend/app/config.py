@@ -53,12 +53,11 @@ class Settings(BaseSettings):
     def database_url(self) -> str:
         """
         Runtime database URL for SQLAlchemy async.
-        Uses pooled connection (POSTGRES_URL) for app queries.
-        Converts postgres:// → postgresql+asyncpg://
+        Cleans the URL to ensure compatibility with asyncpg.
         """
         url = self.postgres_url or self.postgres_url_non_pooling
         if not url:
-            # Build from individual components as fallback
+            # Keep your existing fallback logic
             if self.postgres_host and self.postgres_user:
                 url = (
                     f"postgresql+asyncpg://{self.postgres_user}:"
@@ -67,10 +66,17 @@ class Settings(BaseSettings):
                 )
                 return url
             return ""
-        # Replace scheme for asyncpg
-        return url.replace("postgres://", "postgresql+asyncpg://", 1) \
-                  .replace("postgresql://", "postgresql+asyncpg://", 1)
 
+        # 1. Convert to async driver prefix
+        url = url.replace("postgres://", "postgresql+asyncpg://", 1) \
+                 .replace("postgresql://", "postgresql+asyncpg://", 1)
+        
+        # 2. STRIP sslmode (This is the fix for your TypeError)
+        # This removes everything after the '?' to stop the sslmode error
+        if "?" in url:
+            url = url.split("?")[0]
+            
+        return url
     @property
     def direct_database_url(self) -> str:
         """
