@@ -8,7 +8,6 @@ from app.dependencies.auth import (
     create_refresh_token,
     decode_token,
     get_current_user,
-    require_super_admin,
 )
 from app.dependencies.db import get_db
 from app.models.user import User, UserRole
@@ -36,7 +35,7 @@ def verify_password(plain: str, hashed: str) -> bool:
 # ── POST /api/auth/register ────────────────────────────────────────────────
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
-async def register(payload: RegisterRequest, db: AsyncSession = Depends(get_db), current_admin: User = Depends(require_super_admin)):
+async def register(payload: RegisterRequest, db: AsyncSession = Depends(get_db)):
     
     # Only an existing Super Admin can now register new users.
     # Check email not already taken
