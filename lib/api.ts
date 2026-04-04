@@ -1,31 +1,35 @@
 import axios from "axios";
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "/api";
-
 export const api = axios.create({
-  baseURL: BASE_URL,
+  baseURL: process.env.NEXT_PUBLIC_API_URL ?? "/api",
   headers: { "Content-Type": "application/json" },
   withCredentials: true,
 });
 
-// Attach JWT on every request
 api.interceptors.request.use((config) => {
-  if (typeof window !== "undefined") {
-    try {
-      // Read token from Zustand persisted storage
-      const raw = localStorage.getItem("civicpulse-auth");
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        const token  = parsed?.state?.token;
-        if (token) config.headers.Authorization = `Bearer ${token}`;
-      }
-    } catch {}
-  }
+  if (typeof window === "undefined") return config;
+
+  try {
+    const raw = localStorage.getItem("civicpulse-auth");
+    if (!raw) return config;
+
+    const parsed      = JSON.parse(raw);
+    const token       = parsed?.state?.token;
+    const tokenExpiry = parsed?.state?.tokenExpiry;
+
+    // Token expired — clear storage and redirect
+    if (tokenExpiry && Date.now() > tokenExpiry) {
+      localStorage.removeItem("civicpulse-auth");
+      window.location.href = "/auth/login?reason=expired";
+      return config;
+    }
+
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+  } catch {}
+
   return config;
 });
 
-// Redirect to login on 401
 api.interceptors.response.use(
   (res) => res,
   (err) => {
@@ -34,7 +38,8 @@ api.interceptors.response.use(
       typeof window !== "undefined" &&
       !window.location.pathname.startsWith("/auth")
     ) {
-      window.location.href = "/auth/login";
+      localStorage.removeItem("civicpulse-auth");
+      window.location.href = "/auth/login?reason=unauthorized";
     }
     return Promise.reject(err);
   }

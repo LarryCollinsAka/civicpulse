@@ -121,10 +121,37 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
   html {
     @apply font-sans;
   }
+
+  /* Phone input custom styles */
+  .PhoneInput {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .PhoneInputInput {
+    flex: 1;
+    background: transparent;
+    outline: none;
+    font-size: 14px;
+  }
+
+  .PhoneInputCountrySelect {
+    background: transparent;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  @import 'react-phone-number-input/style.css';
 }

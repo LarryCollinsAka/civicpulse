@@ -1,11 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const PUBLIC_LOCALES = ["fr", "en"];
+const PUBLIC_PATHS = [
+  "/",
+  "/auth/login",
+  "/auth/register",
+  "/auth/citizen",
+  "/auth/callback",
+  "/auth/forgot-password",
+];
+
+const ROLE_PATHS: Record<string, string[]> = {
+  "/dashboard":  ["citizen", "city_admin", "super_admin"],
+  "/report":     ["citizen", "city_admin", "super_admin"],
+  "/incidents":  ["citizen", "city_admin", "super_admin"],
+  "/profile":    ["citizen", "city_admin", "super_admin"],
+  "/map":        ["city_admin", "super_admin"],
+  "/platform":   ["super_admin"],
+};
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Skip API routes, static files, and _next
+  // Skip static files, API routes, _next
   if (
     pathname.startsWith("/api") ||
     pathname.startsWith("/_next") ||
@@ -14,23 +30,32 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Read locale preference from cookie or Accept-Language header
+  // Set locale header
   const cookieLocale = request.cookies.get("NEXT_LOCALE")?.value;
-  const headerLocale = request.headers
-    .get("accept-language")
-    ?.split(",")[0]
-    .split("-")[0];
-
+  const headerLocale = request.headers.get("accept-language")
+    ?.split(",")[0].split("-")[0];
   const locale =
-    PUBLIC_LOCALES.includes(cookieLocale ?? "")
-      ? cookieLocale
-      : PUBLIC_LOCALES.includes(headerLocale ?? "")
-      ? headerLocale
-      : "fr"; // default to French for Cameroon
+    cookieLocale === "en" ? "en" :
+    headerLocale === "en" ? "en" : "fr";
 
-  // Set locale header for Server Components to read
   const response = NextResponse.next();
-  response.headers.set("x-locale", locale!);
+  response.headers.set("x-locale", locale);
+
+  // Public paths — no auth needed
+  if (PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
+    return response;
+  }
+
+  // Check for auth cookie / token
+  // Note: full JWT validation happens in FastAPI
+  // Middleware just checks presence of token for quick redirect
+  const authCookie = request.cookies.get("civicpulse-auth")?.value;
+  if (!authCookie) {
+    const loginUrl = new URL("/auth/login", request.url);
+    loginUrl.searchParams.set("reason", "unauthenticated");
+    return NextResponse.redirect(loginUrl);
+  }
+
   return response;
 }
 

@@ -60,3 +60,33 @@ export const SDG_NAMES_FR: Record<number, string> = {
   16: "Paix et justice",
   17: "Partenariats",
 };
+
+// Number formatting
+export function formatNumber(
+  value: number,
+  locale: "fr" | "en" = "fr",
+  options?: Intl.NumberFormatOptions
+): string {
+  return new Intl.NumberFormat(
+    locale === "fr" ? "fr-FR" : "en-US",
+    options
+  ).format(value);
+}
+
+export function formatCurrency(
+  value: number,
+  currency = "XAF", // CFA Franc for Cameroon
+  locale: "fr" | "en" = "fr"
+): string {
+  return new Intl.NumberFormat(
+    locale === "fr" ? "fr-CM" : "en-CM",
+    { style: "currency", currency, maximumFractionDigits: 0 }
+  ).format(value);
+}
+
+export function formatCompact(value: number, locale: "fr" | "en" = "fr"): string {
+  return new Intl.NumberFormat(
+    locale === "fr" ? "fr-FR" : "en-US",
+    { notation: "compact", compactDisplay: "short" }
+  ).format(value);
+}

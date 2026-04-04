@@ -5,42 +5,46 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useAuthStore } from "@/store/authStore";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import {
+  PhoneNumberInput,
+  isValidPhoneNumber,
+} from "@/components/ui/PhoneInput";
 import { cn } from "@/lib/utils";
 
 const t = {
   fr: {
-    title:      "Connexion Citoyen",
-    subtitle:   "Entrez votre numéro de téléphone",
-    phone:      "Numéro de téléphone",
-    phonePh:    "+237 6XX XXX XXX",
-    sendOtp:    "Envoyer le code",
-    sending:    "Envoi…",
-    otpSent:    "Code envoyé sur votre téléphone",
-    otp:        "Code de vérification",
-    otpPh:      "123456",
-    verify:     "Vérifier et se connecter",
-    verifying:  "Vérification…",
-    resend:     "Renvoyer le code",
-    back:       "Changer de numéro",
-    backLogin:  "Retour à la connexion",
-    error:      "Code incorrect. Réessayez.",
+    title: "Connexion Citoyen",
+    subtitle: "Entrez votre numéro de téléphone",
+    phone: "Numéro de téléphone",
+    phonePh: "+237 6XX XXX XXX",
+    sendOtp: "Envoyer le code",
+    sending: "Envoi…",
+    otpSent: "Code envoyé sur votre téléphone",
+    otp: "Code de vérification",
+    otpPh: "123456",
+    verify: "Vérifier et se connecter",
+    verifying: "Vérification…",
+    resend: "Renvoyer le code",
+    back: "Changer de numéro",
+    backLogin: "Retour à la connexion",
+    error: "Code incorrect. Réessayez.",
   },
   en: {
-    title:      "Citizen Login",
-    subtitle:   "Enter your phone number",
-    phone:      "Phone number",
-    phonePh:    "+237 6XX XXX XXX",
-    sendOtp:    "Send code",
-    sending:    "Sending…",
-    otpSent:    "Code sent to your phone",
-    otp:        "Verification code",
-    otpPh:      "123456",
-    verify:     "Verify and sign in",
-    verifying:  "Verifying…",
-    resend:     "Resend code",
-    back:       "Change number",
-    backLogin:  "Back to login",
-    error:      "Incorrect code. Please try again.",
+    title: "Citizen Login",
+    subtitle: "Enter your phone number",
+    phone: "Phone number",
+    phonePh: "+237 6XX XXX XXX",
+    sendOtp: "Send code",
+    sending: "Sending…",
+    otpSent: "Code sent to your phone",
+    otp: "Verification code",
+    otpPh: "123456",
+    verify: "Verify and sign in",
+    verifying: "Verifying…",
+    resend: "Resend code",
+    back: "Change number",
+    backLogin: "Back to login",
+    error: "Incorrect code. Please try again.",
   },
 };
 
@@ -48,14 +52,14 @@ type Step = "phone" | "otp";
 
 export function CitizenAuthForm() {
   const [locale, setLocale] = useState<"fr" | "en">("fr");
-  const [step, setStep]     = useState<Step>("phone");
-  const [phone, setPhone]   = useState("");
-  const [otp, setOtp]       = useState("");
+  const [step, setStep] = useState<Step>("phone");
+  const [phone, setPhone] = useState("");
+  const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError]   = useState("");
-  const router              = useRouter();
+  const [error, setError] = useState("");
+  const router = useRouter();
   const { setUser, setToken } = useAuthStore();
-  const i18n                = t[locale];
+  const i18n = t[locale];
 
   async function sendOTP() {
     if (!phone) return;
@@ -124,18 +128,21 @@ export function CitizenAuthForm() {
       {step === "phone" ? (
         <div className="space-y-4">
           <div>
-            <label className="mb-1.5 block text-sm font-medium">{i18n.phone}</label>
-            <input
-              type="tel"
+            <label className="mb-1.5 block text-sm font-medium">
+              {i18n.phone}
+            </label>
+            <PhoneNumberInput
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder={i18n.phonePh}
-              className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-brand-600"
+              onChange={setPhone}
+              defaultCountry="CM"
+              error={!!error && !phone}
             />
           </div>
 
           {error && (
-            <p className="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-600">{error}</p>
+            <p className="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-600">
+              {error}
+            </p>
           )}
 
           <button
@@ -148,7 +155,9 @@ export function CitizenAuthForm() {
           </button>
 
           <p className="text-center text-xs text-muted-foreground">
-            <a href="/auth/login" className="hover:text-brand-600">{i18n.backLogin}</a>
+            <a href="/auth/login" className="hover:text-brand-600">
+              {i18n.backLogin}
+            </a>
           </p>
         </div>
       ) : (
@@ -158,7 +167,9 @@ export function CitizenAuthForm() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-sm font-medium">{i18n.otp}</label>
+            <label className="mb-1.5 block text-sm font-medium">
+              {i18n.otp}
+            </label>
             <input
               type="text"
               inputMode="numeric"
@@ -171,7 +182,9 @@ export function CitizenAuthForm() {
           </div>
 
           {error && (
-            <p className="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-600">{error}</p>
+            <p className="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-600">
+              {error}
+            </p>
           )}
 
           <button
@@ -184,10 +197,23 @@ export function CitizenAuthForm() {
           </button>
 
           <div className="flex justify-between text-xs text-muted-foreground">
-            <button onClick={() => { setStep("phone"); setOtp(""); setError(""); }}
-              className="hover:text-brand-600">{i18n.back}</button>
-            <button onClick={sendOTP} disabled={loading}
-              className="hover:text-brand-600">{i18n.resend}</button>
+            <button
+              onClick={() => {
+                setStep("phone");
+                setOtp("");
+                setError("");
+              }}
+              className="hover:text-brand-600"
+            >
+              {i18n.back}
+            </button>
+            <button
+              onClick={sendOTP}
+              disabled={loading}
+              className="hover:text-brand-600"
+            >
+              {i18n.resend}
+            </button>
           </div>
         </div>
       )}
