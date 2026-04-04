@@ -19,7 +19,6 @@ class RegisterRequest(BaseModel):
             raise ValueError("Password must be at least 8 characters")
         return v
 
-
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
@@ -53,3 +52,8 @@ class TokenResponse(BaseModel):
 
 class MessageResponse(BaseModel):
     message: str
+
+class OAuthCallbackRequest(BaseModel):
+    supabase_access_token: str
+    provider: str = "email"
+    phone: str | None = None    

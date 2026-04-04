@@ -9,6 +9,7 @@ alembic==1.15.1
 asyncpg==0.30.0
 geoalchemy2==0.17.1
 pgvector==0.3.6
+supabase==2.15.1
 
 # ── Validation & settings ──────────────────────────────────────────────────
 pydantic==2.12.0

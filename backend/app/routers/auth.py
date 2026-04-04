@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from passlib.context import CryptContext
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.schemas.auth import OAuthCallbackRequest
 
 from app.dependencies.auth import (
     create_access_token,
@@ -148,3 +149,61 @@ async def logout():
     # JWT is stateless — client discards the token
     # Token blacklisting can be added later via Redis
     return MessageResponse(message="Logged out successfully")
+
+
+@router.post("/oauth/callback", response_model=TokenResponse)
+async def oauth_callback(
+    payload: OAuthCallbackRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Exchange a Supabase access token for a CivicPulse JWT.
+    Called after Google, Facebook, or Phone OTP login.
+    """
+    from app.config import settings
+    from supabase import create_client
+
+    # Verify the Supabase token and get user info
+    supabase = create_client(settings.supabase_url, settings.supabase_service_role_key)
+    supabase_user = supabase.auth.get_user(payload.supabase_access_token)
+
+    if not supabase_user or not supabase_user.user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid Supabase token",
+        )
+
+    sb_user = supabase_user.user
+    email   = sb_user.email
+    phone   = payload.phone or (sb_user.phone if hasattr(sb_user, "phone") else None)
+
+    # Find or create user
+    query = select(User).where(
+        (User.email == email) if email else (User.phone == phone)
+    )
+    result = await db.execute(query)
+    user   = result.scalar_one_or_none()
+
+    if not user:
+        # First OAuth login — create citizen account
+        user = User(
+            email=email,
+            phone=phone,
+            full_name=sb_user.user_metadata.get("full_name") or
+                      sb_user.user_metadata.get("name") or
+                      email,
+            role=UserRole.citizen,
+            is_verified=True,
+            preferred_language="fr",
+        )
+        db.add(user)
+        await db.flush()
+
+    access_token  = create_access_token(user.id, user.role, user.city_id)
+    refresh_token = create_refresh_token(user.id)
+
+    return TokenResponse(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        user=UserRead.model_validate(user),
+    )
